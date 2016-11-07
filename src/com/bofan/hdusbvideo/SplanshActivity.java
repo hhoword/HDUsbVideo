@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -39,6 +40,18 @@ public class SplanshActivity extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if(isExist){
+					/*ComponentName componetName = new ComponentName(  
+							"com.empia.hdplayer",  
+							"com.empia.hdplayer.EMPIAActivity"); 
+					Intent localIntent = new Intent();
+					localIntent.setComponent(componetName);
+					startActivity(localIntent);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
 					Intent intent = new Intent(SplanshActivity.this, MainActivity.class);
 					startActivity(intent);
 				}else{
@@ -101,34 +114,34 @@ public class SplanshActivity extends Activity{
 								a(mUsbDeviceConnection, 144, arrayOfByte3, arrayOfByte5);
 							}
 						}else  if ((0xFF & arrayOfByte5[0]) == 185) {
-						      a(mUsbDeviceConnection, 128, 31);
-						      a(mUsbDeviceConnection, 132, arrayOfByte1);
-						      Log.d("Suspend Service", "ACTION_SCREEN_ON 0x80 : 0x" + Integer.toHexString(0xFF & arrayOfByte1[0]));
-						      arrayOfByte2[0] = 6;
-						      arrayOfByte2[1] = 0;
-						      b(mUsbDeviceConnection, 144, arrayOfByte2);
-						      arrayOfByte3[0] = 6;
-						      a(mUsbDeviceConnection, 144, arrayOfByte3, arrayOfByte5);
-						      Log.d("Suspend Service", "ACTION_SCREEN_ON IT6604 0x06 : 0x" + Integer.toHexString(0xFF & arrayOfByte5[0]));
-						      arrayOfByte2[0] = 7;
-						      arrayOfByte2[1] = 0;
-						      b(mUsbDeviceConnection, 144, arrayOfByte2);
-						      arrayOfByte3[0] = 7;
-						      a(mUsbDeviceConnection, 144, arrayOfByte3, arrayOfByte5);
-						      Log.d("Suspend Service", "ACTION_SCREEN_ON IT6604 0x07 : 0x" + Integer.toHexString(0xFF & arrayOfByte5[0]));
-						    }
-						mUsbDeviceConnection.close();
+							a(mUsbDeviceConnection, 128, 31);
+							a(mUsbDeviceConnection, 132, arrayOfByte1);
+							Log.d("Suspend Service", "ACTION_SCREEN_ON 0x80 : 0x" + Integer.toHexString(0xFF & arrayOfByte1[0]));
+							arrayOfByte2[0] = 6;
+							arrayOfByte2[1] = 0;
+							b(mUsbDeviceConnection, 144, arrayOfByte2);
+							arrayOfByte3[0] = 6;
+							a(mUsbDeviceConnection, 144, arrayOfByte3, arrayOfByte5);
+							Log.d("Suspend Service", "ACTION_SCREEN_ON IT6604 0x06 : 0x" + Integer.toHexString(0xFF & arrayOfByte5[0]));
+							arrayOfByte2[0] = 7;
+							arrayOfByte2[1] = 0;
+							b(mUsbDeviceConnection, 144, arrayOfByte2);
+							arrayOfByte3[0] = 7;
+							a(mUsbDeviceConnection, 144, arrayOfByte3, arrayOfByte5);
+							Log.d("Suspend Service", "ACTION_SCREEN_ON IT6604 0x07 : 0x" + Integer.toHexString(0xFF & arrayOfByte5[0]));
+						}
+						//						mUsbDeviceConnection.close();
 					}else{
 						mUsbDeviceConnection.close();
 						return ;
 					}
-				}else{
-					PendingIntent localPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent("com.empia.USB_PERMISSION"), 0);
-					IntentFilter localIntentFilter = new IntentFilter("com.empia.USB_PERMISSION");
-					registerReceiver(mUsbReceiver, localIntentFilter);
-					//				this.bU = true;
-					localUsbManager.requestPermission(localUsbDevice, localPendingIntent);
 				}
+			}else{
+				PendingIntent localPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent("com.empia.USB_PERMISSION"), 0);
+				IntentFilter localIntentFilter = new IntentFilter("com.empia.USB_PERMISSION");
+				registerReceiver(mUsbReceiver, localIntentFilter);
+				//				this.bU = true;
+				localUsbManager.requestPermission(localUsbDevice, localPendingIntent);
 			}
 		}
 	}

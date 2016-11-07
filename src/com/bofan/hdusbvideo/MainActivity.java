@@ -83,9 +83,6 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 		empialib.init();
 		//设置SurfaceView自己不管理的缓冲区  
 		surfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); 
-		surfaceHolder = surfaceView.getHolder(); // 绑定SurfaceView，取得SurfaceHolder对象  
-		surfaceHolder.setFixedSize(width, height); // 预览大小設置  
-		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);  
 		surfaceView.getHolder().addCallback(this);     
 		btnStart.setOnClickListener(this);
 
@@ -144,9 +141,11 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
 		this.surfaceHolder = holder;
+//		surfaceHolder.setFixedSize(width, height); // 预览大小設置  
+//		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);  
 		Log.i("bofan", "surface create");
-		empialib.set_inputsource(EMPIA_VIDEOIN_COMPOSITE);
-		empialib.set_videostandard(EMPIA_VIDEOSTD_NTSC, false);
+		empialib.set_inputsource(EMPIA_VIDEOIN_COMPONENT_P);
+		empialib.set_videostandard(EMPIA_VIDEOSTD_SECAM, false);
 
 		empialib.set_brightness(0x70);
 		empialib.set_contrast(0x20);
@@ -157,7 +156,7 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 
 		try {
 			mediaCodec = MediaCodec.createDecoderByType("video/avc");
-			MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height);  
+			MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", 1920, 1080);  
 			mediaCodec.configure(mediaFormat, surfaceHolder.getSurface(), null, 0);  
 			mediaCodec.start();
 		} catch (IOException e) {
@@ -189,15 +188,19 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 		public void run() {
 			// TODO Auto-generated method stub
 			int len = 0;
-			byte[] databuf = new byte[width * height];
+//			byte[] databuf = new byte[width * height];//846000
+			byte[] databuf = new byte[846000];
 			long[] VideoReturnVal = new long[4];
+//			int VideoReturnVal;
 			//			Canvas canvas = null;   //Canvas的引用  
 			int mCount = 0;
 			ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
 			ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
 			while(RUN_THREAD){
 				VideoReturnVal = empialib.read_video_data(databuf);
-				len = (int)VideoReturnVal[0]; 
+//				VideoReturnVal = empialib.read_ts_data(databuf);
+				len = (int)VideoReturnVal[0];
+//				len = VideoReturnVal;
 				if(len > 0){
 					//					onFrame(databuf, 0, len);
 
@@ -235,10 +238,10 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 						wirteToFile(databuf);
 					}
 				}
-				Log.d("eMPIAh264Webcam", "Video pts : " + VideoReturnVal[1]);
-				Log.d("eMPIAh264Webcam", "get_brightness : " + empialib.get_brightness());
-				Log.d("eMPIAh264Webcam", "get_contrast : " + empialib.get_contrast());
-				Log.d("eMPIAh264Webcam", "get_saturation : " + empialib.get_saturation());
+//				Log.d("eMPIAh264Webcam", "Video pts : " + VideoReturnVal[1]);
+//				Log.d("eMPIAh264Webcam", "get_brightness : " + empialib.get_brightness());
+//				Log.d("eMPIAh264Webcam", "get_contrast : " + empialib.get_contrast());
+//				Log.d("eMPIAh264Webcam", "get_saturation : " + empialib.get_saturation());
 			}	
 
 		}
