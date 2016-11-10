@@ -51,6 +51,7 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 	//	byte[] h264 = new byte[width*height*3/2];
 	//	private Bitmap bitmap;  
 	private MediaCodec mediaCodec;
+	private ByteBuffer[] inputBuffers;
 	private FileOutputStream fos;
 	private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
 
@@ -133,6 +134,8 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 				e.printStackTrace();
 			}
 		}
+		empialib.stop_ts_stream();
+
 		empialib.capture_stop();
 	}
 
@@ -144,25 +147,28 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 //		surfaceHolder.setFixedSize(width, height); // 预览大小設置  
 //		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);  
 		Log.i("bofan", "surface create");
-		empialib.set_inputsource(EMPIA_VIDEOIN_COMPONENT_P);
-		empialib.set_videostandard(EMPIA_VIDEOSTD_SECAM, false);
-
-		empialib.set_brightness(0x70);
-		empialib.set_contrast(0x20);
-		empialib.set_saturation(0x35);
-
-		boolean res =  empialib.capture_start();
-		Log.i("bofan", "empialib start:"+res);
-
 		try {
 			mediaCodec = MediaCodec.createDecoderByType("video/avc");
 			MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", 1920, 1080);  
 			mediaCodec.configure(mediaFormat, surfaceHolder.getSurface(), null, 0);  
 			mediaCodec.start();
+			inputBuffers = mediaCodec.getInputBuffers();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
+
+		empialib.set_inputsource(EMPIA_VIDEOIN_COMPOSITE);
+		empialib.set_videostandard(EMPIA_VIDEOSTD_NTSC, false);
+
+		boolean res =  empialib.capture_start();
+		empialib.set_bitrate(18);
+		empialib.setup_scaler(1920, 1080);
+		empialib.set_brightness(0x70);
+		empialib.set_contrast(0x20);
+		empialib.set_saturation(0x35);
+
+		Log.i("bofan", "empialib start:"+res);
 
 		if(res){   	    
 			DrawThread drawThread = new DrawThread();
@@ -190,13 +196,14 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 			int len = 0;
 //			byte[] databuf = new byte[width * height];//846000
 			byte[] databuf = new byte[846000];
+//			byte[] databuf = new byte[54520];
 			long[] VideoReturnVal = new long[4];
 //			int VideoReturnVal;
 			//			Canvas canvas = null;   //Canvas的引用  
 			int mCount = 0;
-			ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
 			ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
 			while(RUN_THREAD){
+				int inputBufferIndex = mediaCodec.dequeueInputBuffer(-1);
 				VideoReturnVal = empialib.read_video_data(databuf);
 //				VideoReturnVal = empialib.read_ts_data(databuf);
 				len = (int)VideoReturnVal[0];
@@ -204,7 +211,6 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 				if(len > 0){
 					//					onFrame(databuf, 0, len);
 
-					int inputBufferIndex = mediaCodec.dequeueInputBuffer(-1);
 					if (inputBufferIndex >= 0) {
 						ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
 						inputBuffer.clear();
