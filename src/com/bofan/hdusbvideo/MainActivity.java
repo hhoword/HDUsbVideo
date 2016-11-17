@@ -81,7 +81,11 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 		btnStart =(Button)this.findViewById(R.id.btnStart);
 		localUsbManager = (UsbManager)getSystemService("usb");
 		empialib = new EMPIA_LIB(localUsbManager);
-		empialib.init();
+		int res = empialib.init();
+		if(0>res){
+			Toast.makeText(this, "初始化失败，请检查摄像头", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		//设置SurfaceView自己不管理的缓冲区  
 		surfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); 
 		surfaceView.getHolder().addCallback(this);     
@@ -196,16 +200,16 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 			int len = 0;
 //			byte[] databuf = new byte[width * height];//846000
 			byte[] databuf = new byte[846000];
-//			byte[] databuf = new byte[54520];
+			byte[] databuf2 = new byte[54520];
 			long[] VideoReturnVal = new long[4];
-//			int VideoReturnVal;
+			int VideoReturnVal2;
 			//			Canvas canvas = null;   //Canvas的引用  
 			int mCount = 0;
 			ByteBuffer[] outputBuffers = mediaCodec.getOutputBuffers();
 			while(RUN_THREAD){
 				int inputBufferIndex = mediaCodec.dequeueInputBuffer(-1);
 				VideoReturnVal = empialib.read_video_data(databuf);
-//				VideoReturnVal = empialib.read_ts_data(databuf);
+				VideoReturnVal2 = empialib.read_ts_data(databuf2);
 				len = (int)VideoReturnVal[0];
 //				len = VideoReturnVal;
 				if(len > 0){
@@ -241,7 +245,7 @@ public class MainActivity extends Activity implements OnClickListener,SurfaceHol
 						Log.d("Fuck", "outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
 					}
 					if(isWrite){
-						wirteToFile(databuf);
+						wirteToFile(databuf2);
 					}
 				}
 //				Log.d("eMPIAh264Webcam", "Video pts : " + VideoReturnVal[1]);

@@ -26,6 +26,7 @@ public class SplanshActivity extends Activity{
 	private Button button1;
 	private UsbManager localUsbManager;
 	private boolean isExist = false;
+	private boolean isRegis = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -141,8 +142,18 @@ public class SplanshActivity extends Activity{
 				IntentFilter localIntentFilter = new IntentFilter("com.empia.USB_PERMISSION");
 				registerReceiver(mUsbReceiver, localIntentFilter);
 				//				this.bU = true;
+				this.isRegis = true;
 				localUsbManager.requestPermission(localUsbDevice, localPendingIntent);
 			}
+		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		if(isRegis){
+			unregisterReceiver(mUsbReceiver);
 		}
 	}
 
